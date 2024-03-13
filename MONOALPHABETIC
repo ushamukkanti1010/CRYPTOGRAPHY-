@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+int main() {
+    int n,i;
+    char pt[100], ct[100];
+    char key[26] = "ZYXWVUTSRQPONMLKJIHGFEDCBA";
+    printf("Enter plaintext: ");
+    scanf("%s",&pt);
+    n=strlen(pt);
+    for(i = 0; i < n; i++) {
+        if(isalpha(pt[i])) {
+            if(islower(pt[i])) {
+                ct[i] = tolower(key[pt[i] - 'a']);
+            } else {
+                ct[i] = key[pt[i] - 'A'];
+            }
+        } else {
+            ct[i] = pt[i]; 
+        }
+    }
+    ct[i] = '\0';
+    printf("Ciphertext: %s\n", ct);
+    return 0;
+}
