@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Function to perform monoalphabetic substitution encryption
+void monoalphabeticSubstitutionEncrypt(char message[], char key[]) {
+    int i, j;
+    char ch;
+
+    // Iterate through each character in the message
+    for (i = 0; message[i] != '\0'; ++i) {
+        ch = message[i];
+
+        // Encrypt uppercase letters
+        if (isupper(ch))
+            printf("%c", key[ch - 'A']);
+
+        // Encrypt lowercase letters
+        else if (islower(ch))
+            printf("%c", tolower(key[ch - 'a']));
+
+        // If character is not a letter, print it unchanged
+        else
+            printf("%c", ch);
+    }
+}
+
+// Function to generate the key for polyalphabetic substitution cipher
+void generatePolyalphabeticKey(char keyword[], char key[]) {
+    int keyword_length = strlen(keyword);
+    int i, j;
+
+    for (i = 0, j = 0; i < 26; ++i) {
+        if (j < keyword_length) {
+            key[i] = keyword[j];
+            ++j;
+        } else {
+            key[i] = 'A' + (i - j);
+        }
+    }
+    key[i] = '\0';
+}
+
+// Function to perform polyalphabetic substitution encryption
+void polyalphabeticSubstitutionEncrypt(char message[], char keyword[]) {
+    char key[27]; // Including null terminator
+    char encrypted_message[1000];
+    int i, j;
+
+    // Generate the key for polyalphabetic substitution cipher
+    generatePolyalphabeticKey(keyword, key);
+
+    // Encrypt each letter in the message using the corresponding monoalphabetic substitution cipher
+    for (i = 0; message[i] != '\0'; ++i) {
+        encrypted_message[i] = key[i % 26];
+    }
+    encrypted_message[i] = '\0';
+
+    // Perform monoalphabetic substitution encryption
+    monoalphabeticSubstitutionEncrypt(message, encrypted_message);
+}
+
+int main() {
+    char message[1000], keyword[100];
+    
+    // Input message from user
+    printf("Enter a message: ");
+    fgets(message, sizeof(message), stdin);
+
+    // Remove newline character if present
+    if (message[strlen(message) - 1] == '\n')
+        message[strlen(message) - 1] = '\0';
+
+    // Input keyword from user
+    printf("Enter a keyword: ");
+    fgets(keyword, sizeof(keyword), stdin);
+
+    // Remove newline character if present
+    if (keyword[strlen(keyword) - 1] == '\n')
+        keyword[strlen(keyword) - 1] = '\0';
+
+    // Encrypt the message using polyalphabetic substitution cipher
+    printf("Encrypted message: ");
+    polyalphabeticSubstitutionEncrypt(message, keyword);
+    printf("\n");
+
+    return 0;
+}
