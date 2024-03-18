@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#define ALPHABET_SIZE 26
+void calculateFrequencies(char *text, int frequencies[]) {
+    int len = strlen(text);
+    for (int i = 0; i < len; i++) {
+        if (isalpha(text[i])) {
+            frequencies[tolower(text[i]) - 'a']++;
+        }
+    }
+}
+void letterFrequencyAttack(char *ciphertext, int topPlaintexts) {
+    int frequencies[ALPHABET_SIZE] = {0};
+    calculateFrequencies(ciphertext, frequencies);
+    int frequencyMap[ALPHABET_SIZE][2];
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        frequencyMap[i][0] = i;
+        frequencyMap[i][1] = frequencies[i];
+    }
+    for (int i = 0; i < ALPHABET_SIZE - 1; i++) {
+        for (int j = 0; j < ALPHABET_SIZE - i - 1; j++) {
+            if (frequencyMap[j][1] < frequencyMap[j + 1][1]) {
+                int tempFreq = frequencyMap[j][1];
+                frequencyMap[j][1] = frequencyMap[j + 1][1];
+                frequencyMap[j + 1][1] = tempFreq;
+                int tempLetter = frequencyMap[j][0];
+                frequencyMap[j][0] = frequencyMap[j + 1][0];
+                frequencyMap[j + 1][0] = tempLetter;
+            }
+        }
+    }
+    int shiftMap[ALPHABET_SIZE];
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        shiftMap[frequencyMap[i][0]] = (frequencyMap[i][0] - ('e' - 'a') + ALPHABET_SIZE) % ALPHABET_SIZE;
+    }
+    printf("Top %d possible plaintexts:\n", topPlaintexts);
+    for (int i = 0; i < topPlaintexts; i++) {
+        printf("%d. ", i + 1);
+        for (int j = 0; ciphertext[j] != '\0'; j++) {
+            if (isalpha(ciphertext[j])) {
+                char decryptedChar = 'a' + shiftMap[tolower(ciphertext[j]) - 'a'];
+                printf("%c", islower(ciphertext[j]) ? decryptedChar : toupper(decryptedChar));
+            } else {
+                printf("%c", ciphertext[j]);  
+            }
+        }
+        printf("\n");
+    }
+}
+int main() {
+    char ciphertext[] = "Wklv lv d whvwphqw lqwhusuhwdwlrq fdvhv duh rxwsxw iru d vxssruw xs frgh";
+    int topPlaintexts = 10; 
+    letterFrequencyAttack(ciphertext, topPlaintexts);
+    return 0;
+}
