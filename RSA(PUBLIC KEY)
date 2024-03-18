@@ -1,0 +1,22 @@
+#include <stdio.h>
+int gcd(int a, int b) {
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
+
+int main() {
+    int n = 3599; 
+    int e = 31;   
+    int plaintext_block_with_common_factor; 
+    plaintext_block_with_common_factor = 100; 
+    if (gcd(plaintext_block_with_common_factor, n) != 1) {
+        printf("Plaintext block has a common factor with n. This might indicate a weakness in encryption.\n");
+        printf("Further analysis may be possible to exploit this weakness and potentially recover the private key.\n");
+    } else {
+        printf("Plaintext block does not have a common factor with n.\n");
+        printf("This situation may not provide immediate help in recovering the private key.\n");
+    }
+
+    return 0;
+}RSA(
