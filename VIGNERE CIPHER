@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define ALPHABET_SIZE 26
+void vigenereEncrypt(char *plaintext, int *keyStream, char *ciphertext) {
+    int plaintextLen = strlen(plaintext);
+    for (int i = 0; i < plaintextLen; i++) {
+        if (plaintext[i] >= 'A' && plaintext[i] <= 'Z') {
+            ciphertext[i] = 'A' + (plaintext[i] - 'A' + keyStream[i]) % ALPHABET_SIZE;
+        } else {
+            ciphertext[i] = plaintext[i];  
+        }
+    }
+    ciphertext[plaintextLen] = '\0';
+}
+void vigenereDecrypt(char *ciphertext, int *keyStream, char *plaintext) {
+    int ciphertextLen = strlen(ciphertext);
+    for (int i = 0; i < ciphertextLen; i++) {
+        if (ciphertext[i] >= 'A' && ciphertext[i] <= 'Z') {
+            plaintext[i] = 'A' + (ciphertext[i] - 'A' - keyStream[i] + ALPHABET_SIZE) % ALPHABET_SIZE;
+        } else {
+            plaintext[i] = ciphertext[i];  
+        }
+    }
+    plaintext[ciphertextLen] = '\0';
+}
+int main() {
+    char plaintext[] = "SENDMOREMONEY";
+    int keyStream[] = {9, 0, 1, 7, 23, 15, 21, 14, 11, 11, 2, 8, 9};
+    char ciphertext[strlen(plaintext) + 1];
+    char decryptedText[strlen(plaintext) + 1];
+    vigenereEncrypt(plaintext, keyStream, ciphertext);
+    printf("Encrypted ciphertext: %s\n", ciphertext);
+    char targetPlaintext[] = "CASHNOTNEEDED";
+    int key[strlen(ciphertext)];
+    for (int i = 0; i < strlen(ciphertext); i++) {
+        key[i] = (targetPlaintext[i] - ciphertext[i] + ALPHABET_SIZE) % ALPHABET_SIZE;
+    }
+    vigenereDecrypt(ciphertext, key, decryptedText);
+    printf("Decrypted plaintext using found key: %s\n", decryptedText);
+    return 0;
+}
