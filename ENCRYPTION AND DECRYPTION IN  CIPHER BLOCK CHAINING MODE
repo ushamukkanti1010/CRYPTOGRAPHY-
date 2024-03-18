@@ -1,0 +1,140 @@
+#include <stdio.h>
+#include <stdlib.h>
+int IP[] = {2, 6, 3, 1, 4, 8, 5, 7};
+int FP[] = {4, 1, 3, 5, 7, 2, 8, 6};
+int EP[] = {4, 1, 2, 3, 2, 3, 4, 1};
+int P4[] = {2, 4, 3, 1};
+int P10[] = {3, 5, 2, 7, 4, 10, 1, 9, 8, 6};
+int P8[] = {6, 3, 7, 4, 8, 5, 10, 9};
+int S0[4][4] = {{1, 0, 3, 2},
+                {3, 2, 1, 0},
+                {0, 2, 1, 3},
+                {3, 1, 3, 2}};
+int S1[4][4] = {{0, 1, 2, 3},
+                {2, 0, 1, 3},
+                {3, 0, 1, 0},
+                {2, 1, 0, 3}};
+void leftShift(int key[], int bits) {
+    int i, temp;
+    while(bits--) {
+        temp = key[0];
+        for(i = 0; i < 9; i++)
+            key[i] = key[i + 1];
+        key[9] = temp;
+    }
+}
+void permutation(int *input, int *output, int *permutation_table, int size) {
+    for (int i = 0; i < size; i++)
+        output[i] = input[permutation_table[i] - 1];
+}
+void xorOperation(int *a, int *b, int size) {
+    for (int i = 0; i < size; i++)
+        a[i] ^= b[i];
+}
+void sBox(int *input, int *output) {
+    int row, col;
+    row = 2 * input[0] + input[3];
+    col = 2 * input[1] + input[2];
+    output[0] = S0[row][col] / 2;
+    output[1] = S0[row][col] % 2;
+    row = 2 * input[4] + input[7];
+    col = 2 * input[5] + input[6];
+    output[2] = S1[row][col] / 2;
+    output[3] = S1[row][col] % 2;
+}
+void generateKeys(int *key, int *K1, int *K2) {
+    int temp[10], i;
+    permutation(key, temp, P10, 10);
+    leftShift(temp, 1);
+    permutation(temp, K1, P8, 8);
+    leftShift(temp, 2);
+    permutation(temp, K2, P8, 8);
+}
+void F(int *R, int *key, int *output) {
+    int temp[8], expanded[8], sboxed[4];
+    permutation(R, expanded, EP, 8);
+    xorOperation(expanded, key, 8);
+    sBox(expanded, sboxed);
+    permutation(sboxed, temp, P4, 4);
+    xorOperation(temp, output, 4);
+}
+void encrypt(int *plaintext, int *key, int *ciphertext) {
+    int L[4], R[4], temp[4], K1[8], K2[8];
+    generateKeys(key, K1, K2);
+    permutation(plaintext, temp, IP, 8);
+    for (int i = 0; i < 4; i++) {
+        L[i] = temp[i];
+        R[i] = temp[i + 4];
+    }
+    F(R, K1, temp);
+    xorOperation(L, temp, 4);
+    for (int i = 0; i < 4; i++) {
+        temp[i] = L[i];
+        L[i] = R[i];
+        R[i] = temp[i];
+    }
+    F(R, K2, temp);
+    xorOperation(L, temp, 4);
+    for (int i = 0; i < 4; i++)
+        ciphertext[i] = L[i];
+    for (int i = 0; i < 4; i++)
+        ciphertext[i + 4] = R[i];
+    permutation(ciphertext, ciphertext, FP, 8);
+}
+void decrypt(int *ciphertext, int *key, int *plaintext) {
+    int L[4], R[4], temp[4], K1[8], K2[8];
+    generateKeys(key, K1, K2);
+    permutation(ciphertext, temp, IP, 8);
+    for (int i = 0; i < 4; i++) {
+        L[i] = temp[i];
+        R[i] = temp[i + 4];
+    }
+    F(R, K2, temp);
+    xorOperation(L, temp, 4);
+    for (int i = 0; i < 4; i++) {
+        temp[i] = L[i];
+        L[i] = R[i];
+        R[i] = temp[i];
+    }
+    F(R, K1, temp);
+    xorOperation(L, temp, 4);
+    for (int i = 0; i < 4; i++)
+        plaintext[i] = L[i];
+    for (int i = 0; i < 4; i++)
+        plaintext[i + 4] = R[i];
+    permutation(plaintext, plaintext, FP, 8);
+}
+void binaryToInt(int *binary, int *integer) {
+    *integer = 0;
+    for (int i = 0; i < 8; i++)
+        *integer += binary[i] << (7 - i);
+}
+void intToBinary(int integer, int *binary) {
+    for (int i = 0; i < 8; i++)
+        binary[i] = (integer >> (7 - i)) & 1;
+}
+void printBinary(int *binary, int size) {
+    for (int i = 0; i < size; i++)
+        printf("%d", binary[i]);
+    printf("\n");
+}
+int main() {
+    int plaintext[8] = {0, 0, 0, 0, 0, 1, 0, 0};
+    int key[10] = {0, 1, 1, 1, 1, 1, 1, 0, 1, 0};
+    int ciphertext[8], decrypted[8];
+    printf("Plaintext: ");
+    printBinary(plaintext, 8);
+    printf("Key: ");
+    printBinary(key, 10);
+    printf("Encrypting...\n");
+    encrypt(plaintext, key, ciphertext);
+    printf("Ciphertext: ");
+    printBinary(ciphertext, 8);
+    printf("Decrypting...\n");
+    decrypt(ciphertext, key, decrypted);
+    printf("Decrypted plaintext: ");
+    printBinary(decrypted, 8);
+    return 0;
+}
+1 comment on commit f0b2f00
+@hemaviswaraju
