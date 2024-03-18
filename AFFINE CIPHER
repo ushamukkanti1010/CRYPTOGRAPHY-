@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <ctype.h>
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++)
+        if ((a * x) % m == 1)
+            return x;
+    return -1;
+}
+char affineEncrypt(char ch, int a, int b) {
+    return isalpha(ch) ? (islower(ch) ? ((a * (ch - 'a') + b) % 26) + 'a' : ((a * (ch - 'A') + b) % 26) + 'A') : ch;
+}
+char affineDecrypt(char ch, int a, int b) {
+    int a_inv = modInverse(a, 26);
+    return isalpha(ch) ? (islower(ch) ? (((ch - 'a' - b + 26) * a_inv) % 26) + 'a' : (((ch - 'A' - b + 26) * a_inv) % 26) + 'A') : ch;
+}
+int main() {
+    int a, b;
+    printf("Enter values of a and b: ");
+    scanf("%d%d", &a, &b);
+    getchar(); 
+    if (a == 0 || a == 1 || a % 2 == 0 || a % 13 == 0) {
+        printf("Invalid value of a. Choose another value.\n");
+        return 1;
+    }
+    printf("Enter the message: ");
+    char message[1000];
+    fgets(message, sizeof(message), stdin);
+    printf("Encrypted message: ");
+    for (int i = 0; message[i] != '\0'; i++)
+        printf("%c", affineEncrypt(message[i], a, b));
+    printf("\nDecrypted message: ");
+    for (int i = 0; message[i] != '\0'; i++)
+        printf("%c", affineDecrypt(affineEncrypt(message[i], a, b), a, b));
+    return 0;
+}
