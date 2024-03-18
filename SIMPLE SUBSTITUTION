@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <string.h>
+
+void decrypt_substitution_cipher(char ct[]) {
+    int i,n;
+    char dt[n];
+    char sub_key[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[]();*:‡—";
+    char alphabet[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[]();*:‡—";
+    n=strlen(ct);
+    for (i = 0; i < n; i++) {
+        if (ct[i] >= '0' && ct[i] <= '9') {
+            dt[i] = ct[i];
+        } else {
+            int index = strchr(sub_key, ct[i]) - sub_key;
+            dt[i] = alphabet[index];
+        }
+    }
+    dt[i] = '\0';
+    printf("Decrypted text: %s\n", dt);
+}
+int main() {
+    char ciphertext[1000];
+    printf("Enter the ciphertext: ");
+    fgets(ciphertext, sizeof(ciphertext), stdin);
+    if ((strlen(ciphertext) > 0) && (ciphertext[strlen(ciphertext) - 1] == '\n'))
+        ciphertext[strlen(ciphertext) - 1] = '\0';
+    decrypt_substitution_cipher(ciphertext);
+    return 0;
+}simple 
