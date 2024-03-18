@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#define ALPHABET_SIZE 26
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++)
+        if ((a * x) % m == 1)
+            return x;
+    return -1;
+}
+void decrypt_affine(char *ciphertext, int a, int b) {
+    int a_inv = modInverse(a, ALPHABET_SIZE);
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            if (islower(ciphertext[i]))
+                printf("%c", (((ciphertext[i] - 'a' - b + ALPHABET_SIZE) * a_inv) % ALPHABET_SIZE) + 'a');
+            else
+                printf("%c", (((ciphertext[i] - 'A' - b + ALPHABET_SIZE) * a_inv) % ALPHABET_SIZE) + 'A');
+        } else {
+            printf("%c", ciphertext[i]);
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    char freq[26] = {'E','T','A','O','I','N','S','H','R','D','L','C','U','M','W','F','G','Y','P','B','V','K','J','X','Q'};
+    char most_frequent = 'B';
+    char second_most_frequent = 'U';
+    int a = ((second_most_frequent - 'A') - (most_frequent - 'A')) % ALPHABET_SIZE;
+    if (a < 0)
+        a += ALPHABET_SIZE;
+    int b = ((most_frequent - 'A') - (4 * a)) % ALPHABET_SIZE;
+    if (b < 0)
+        b += ALPHABET_SIZE;
+    char ciphertext[] = "DGGQKQCBCPBQACQKPQEKBPPKPQCBCQCQQQACQCQKDQQCQKPEQPCQQKPPCQPKCBCKPQCQCQDQCQCCQPKPKCPQCBQQKCQQKCQC";
+    printf("Affine cipher decryption with a=%d, b=%d:\n", a, b);
+    decrypt_affine(ciphertext, a, b);
+    return 0;
+}
