@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <string.h>
+#define MOD 26
+int mod(int a, int m) {
+    return (a % m + m) % m;
+}
+void encrypt(int key[2][2], char *input, int len, int output[]) {
+    for (int i = 0; i < len; i += 2) {
+        for (int j = 0; j < 2; j++) {
+            output[i + j] = 0;
+            for (int k = 0; k < 2; k++) {
+                output[i + j] += key[j][k] * (input[i + k] - 'A');
+            }
+            output[i + j] = mod(output[i + j], MOD);
+        }
+    }
+}
+void decrypt(int key[2][2], int input[], int len, char *output) {
+    int detInv = mod(key[0][0] * key[1][1] - key[0][1] * key[1][0], MOD);
+    int invKey[2][2] = {
+        {mod(key[1][1] * detInv, MOD), mod(-key[0][1] * detInv, MOD)},
+        {mod(-key[1][0] * detInv, MOD), mod(key[0][0] * detInv, MOD)}
+    };
+    for (int i = 0; i < len; i += 2) {
+        for (int j = 0; j < 2; j++) {
+            int sum = 0;
+            for (int k = 0; k < 2; k++) {
+                sum += invKey[j][k] * (input[i + k] - 'A');
+            }
+            output[i + j] = mod(sum, MOD) + 'A';
+        }
+    }
+}
+int main() {
+    int key[2][2] = {{9, 4}, {5, 7}};
+    char plaintext[] = "ATTACKATDAWN";
+    int len = strlen(plaintext);
+    int ciphertext[len], decrypted[len];
+    encrypt(key, plaintext, len, ciphertext);
+    printf("Ciphertext: ");
+    for (int i = 0; i < len; i++) {
+        printf("%c", ciphertext[i] + 'A');
+    }
+    printf("\n");
+    decrypt(key, ciphertext, len, decrypted);
+    decrypted[len] = '\0';
+    printf("Decrypted: %s\n", decrypted);
+    return 0;
+}
