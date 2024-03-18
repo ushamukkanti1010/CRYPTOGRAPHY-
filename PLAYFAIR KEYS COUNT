@@ -1,0 +1,18 @@
+#include <stdio.h>
+#include <stdint.h>
+uint64_t factorial(int n) {
+    if (n == 0 || n == 1)
+        return 1;
+    else
+        return n * factorial(n - 1);
+}
+int main() {
+    uint64_t total_keys, effective_keys;
+    uint64_t row_col_swap_factor;
+    total_keys = factorial(25);
+    row_col_swap_factor = factorial(5) * factorial(5);
+    effective_keys = total_keys / (row_col_swap_factor * row_col_swap_factor);
+    printf("Total number of possible keys: %llu\n", total_keys);
+    printf("Effective number of unique keys: %llu\n", effective_keys);
+    return 0;
+}
