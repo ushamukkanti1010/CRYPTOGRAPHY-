@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#define ALPHABET_SIZE 26
+void calculateFrequencies(char *text, int frequencies[]) {
+    int len = strlen(text);
+    for (int i = 0; i < len; i++) {
+        if (isalpha(text[i])) {
+            frequencies[tolower(text[i]) - 'a']++;
+        }
+    }
+}
+void letterFrequencyAttack(char *ciphertext, int topPlaintexts) {
+    int frequencies[ALPHABET_SIZE] = {0};
+    calculateFrequencies(ciphertext, frequencies);
+    int maxFreqIndex = 0;
+    for (int i = 1; i < ALPHABET_SIZE; i++) {
+        if (frequencies[i] > frequencies[maxFreqIndex]) {
+            maxFreqIndex = i;
+        }
+    }
+    int shift = (maxFreqIndex + ALPHABET_SIZE - ('e' - 'a')) % ALPHABET_SIZE;
+    printf("Top %d possible plaintexts:\n", topPlaintexts);
+    for (int i = 0; i < topPlaintexts; i++) {
+        printf("%d. ", i + 1);
+        for (int j = 0; ciphertext[j] != '\0'; j++) {
+            if (isalpha(ciphertext[j])) {
+                char decryptedChar = 'a' + (ciphertext[j] - 'a' - shift + ALPHABET_SIZE) % ALPHABET_SIZE;
+                printf("%c", decryptedChar);
+            } else {
+                printf("%c", ciphertext[j]); 
+            }
+        }
+        printf("\n");
+        shift = (shift + 1) % ALPHABET_SIZE; 
+    }
+}
+int main() {
+    char ciphertext[] = "Uifsf jt b tfdsfu dmjdl. Uifsf jt b tfdsfu dmjdl. Uifsf jt b tfdsfu dmjdl.";
+    int topPlaintexts = 10;  
+    letterFrequencyAttack(ciphertext, topPlaintexts);
+    return 0;
+}
+1 comment on commit 2e4e009
