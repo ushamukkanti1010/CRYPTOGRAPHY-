@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <string.h>
+int main() {
+    char pt[20] = {'\0'}, ct[20] = {'\0'}, key[20] = {'\0'}, rt[20] = {'\0'};
+    int i, j;
+    printf("\nEnter the plain text: ");
+    scanf("%s", pt);
+    printf("\nEnter the key: ");
+    scanf("%s", key);
+    j = 0;
+    for (i = strlen(key); i < strlen(pt); i++) {
+        if (j == strlen(key)) {
+            j = 0;
+        }
+        key[i] = key[j];
+        j++;
+    }
+    printf("\nNew key is: %s", key);
+    for (i = 0; i < strlen(pt); i++) {
+        ct[i] = (((pt[i] - 'a') + (key[i] - 'a')) % 26) + 'a';
+    }
+    printf("\n\nCipher text is: %s", ct);
+    for (i = 0; i < strlen(ct); i++) {
+        if (ct[i] < key[i]) {
+            rt[i] = 26 + ((ct[i] - 'a') - (key[i] - 'a')) + 'a';
+        } else {
+            rt[i] = (((ct[i] - 'a') - (key[i] - 'a')) % 26) + 'a';
+        }
+    }
+    printf("\n\nPlain text is: %s\n", rt);
+    return 0;
+}
+1 comment on commit 6f4a40d
