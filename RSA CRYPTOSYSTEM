@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <stdlib.h>
+int encrypt_char(int plaintext_char, int e, int n) {
+    int ciphertext_char = 1;
+    for (int i = 0; i < e; i++) {
+        ciphertext_char = (ciphertext_char * plaintext_char) % n;
+    }
+    return ciphertext_char;
+}
+int main() {
+    int e = 65537;
+    int n = 1000000007; 
+    char plaintext[] = "HELLO";
+    printf("Encrypted message:\n");
+    for (int i = 0; plaintext[i] != '\0'; i++) {
+        if (plaintext[i] >= 'A' && plaintext[i] <= 'Z') {
+            int plaintext_char = plaintext[i] - 'A'; 
+            int ciphertext_char = encrypt_char(plaintext_char, e, n);
+            printf("%d ", ciphertext_char);
+        }
+    }
+    printf("\n");
+    return 0;
+}
