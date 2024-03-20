@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>		#include <stdlib.h>
+#include <string.h>		#include <string.h> 
+#include <openssl/dsa.h>		typedef struct {
+#include <openssl/bn.h>		    unsigned long long p;
+    unsigned long long q;
+    unsigned long long g;
+    unsigned long long x;  
+    unsigned long long y;   
+} DSAKey;
+
+
+// Function to generate a DSA key pair		typedef struct {
+DSA* generateDSAKeyPair() {		    unsigned long long r;
+    DSA *dsa = DSA_new();		    unsigned long long s;
+    if (dsa == NULL) {		} DSASignature; 
+        fprintf(stderr, "Error creating DSA structure.\n");		typedef struct {
+        return NULL;		    unsigned long long n;
+    }		    unsigned long long e;   
+    int bits = 1024; // Key size		    unsigned long long d;  
+    if (!DSA_generate_parameters_ex(dsa, bits, NULL, 0, NULL, NULL, NULL)) {		} RSAKey; 
+        fprintf(stderr, "Error generating DSA parameters.\n");		typedef struct {
+        return NULL;		    unsigned char *data;
+    }		    size_t length;
+    if (!DSA_generate_key(dsa)) {		} Message;
+        fprintf(stderr, "Error generating DSA key pair.\n");		
+        DSA_free(dsa);		unsigned long long mod_exp(unsigned long long base, unsigned long long exponent, unsigned long long modulus) {
+        return NULL;		    unsigned long long result = 1;
+    base = base % modulus;
+
+    while (exponent > 0) {
+        if (exponent % 2 == 1) {
+            result = (result * base) % modulus;
+        }
+
+        exponent = exponent >> 1;
+        base = (base * base) % modulus;
+    }		    }
+    return dsa;		
+    return result;
+}		}
+
+
+// Function to sign a message using DSA		void generate_dsa_key(DSAKey *key) { 
+DSA_SIG* signDSA(const char *message, DSA *dsa) {		
+    if (message == NULL || dsa == NULL) {		
+        fprintf(stderr, "Invalid input.\n");		
+        return NULL;		
+    }		
+    DSA_SIG *signature = DSA_do_sign((unsigned char *)message, strlen(message), dsa);		
+    if (signature == NULL) {		
+        fprintf(stderr, "Error signing the message.\n");		
+        return NULL;		
+    }		
+    return signature;		
+}		}
+
+
+// Function to verify the signature of a message		void generate_rsa_key(RSAKey *key) { 
+int verifySignature(const char *message, DSA_SIG *signature, DSA *dsa) {		
+    if (message == NULL || signature == NULL || dsa == NULL) {		
+        fprintf(stderr, "Invalid input.\n");		
+        return -1;		
+    }		
+    int verified = DSA_do_verify((unsigned char *)message, strlen(message), signature, dsa);		
+    return verified;		
+}		}
+
+
+int main() {		DSASignature *generate_dsa_signature(const Message *message, const DSAKey *key) {
+    // Generate DSA key pair		    DSASignature *signature = (DSASignature *)malloc(sizeof(DSASignature)); 
+    DSA *dsa = generateDSAKeyPair();		
+    if (dsa == NULL) {		
+        fprintf(stderr, "Error generating DSA key pair.\n");		
+        return 1;		
+    }		
+
+
+    const char *message = "Hello, world!";		    return signature;
+}
+
+
+    // Sign the message		unsigned long long generate_rsa_signature(const Message *message, const RSAKey *key) { 
+    DSA_SIG *signature = signDSA(message, dsa);		
+    if (signature == NULL) {		
+        fprintf(stderr, "Error signing the message.\n");		
+        DSA_free(dsa);		
+        return 1;		
+    }		
+
+
+    // Verify the signature		    return 0;
+    int verified = verifySignature(message, signature, dsa);		}
+    if (verified == 1) {		
+        printf("Signature verified successfully.\n");		int main() { 
+    } else if (verified == 0) {		    Message message;
+        printf("Signature verification failed.\n");		    message.data = (unsigned char *)"Hello, DSA and RSA!";
+    } else {		    message.length = strlen((char *)message.data); 
+        fprintf(stderr, "Error verifying signature.\n");		    DSAKey dsaKey;
+    }		    generate_dsa_key(&dsaKey); 
+    DSASignature *dsaSignature = generate_dsa_signature(&message, &dsaKey); 
+    printf("DSA Signature:\n");
+    printf("r: %llu\n", dsaSignature->r);
+    printf("s: %llu\n", dsaSignature->s); 
+    RSAKey rsaKey;
+    generate_rsa_key(&rsaKey); 
+    unsigned long long rsaSignature = generate_rsa_signature(&message, &rsaKey); 
+    printf("RSA Signature: %llu\n", rsaSignature); 
+    free(dsaSignature);
+
+
+    // Clean up		
+    DSA_SIG_free(signature);		
+    DSA_free(dsa);		
+    return 0;		    return 0;
+}		}
