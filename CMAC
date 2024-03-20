@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <stdint.h>
+void left_shift(uint64_t *value) {
+    *value <<= 1;
+    if (*value & (1ULL << 64)) {
+        *value ^= 0x87;
+    }
+}
+void generate_subkeys(uint64_t key, uint64_t *subkey1, uint64_t *subkey2) {
+    *subkey1 = key;
+    left_shift(subkey1);
+    *subkey2 = *subkey1;
+    left_shift(subkey2);
+}
+int main() {
+    uint64_t key = 0x2B7E151628AED2A6; 
+    uint64_t subkey1, subkey2;
+    generate_subkeys(key, &subkey1, &subkey2);
+    // Print the subkeys
+    printf("Subkey 1: %llx\n", subkey1);
+    printf("Subkey 2: %llx\n", subkey2);
+    return 0;
+}
