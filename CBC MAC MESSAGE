@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <string.h>
+void cbc_mac(unsigned char *key, unsigned char *message, unsigned char *mac) {
+    unsigned char iv[16] = {0}; 
+    unsigned char ciphertext[16]; 
+    for (int i = 0; i < 16; i++) {
+        ciphertext[i] = message[i] ^ iv[i];
+    }
+    memcpy(mac, ciphertext, 16);
+}
+int main() {
+    unsigned char key[16] = "0123456789ABCDEF"; 
+    unsigned char message[16] = "Hello, world!"; 
+    unsigned char mac[16]; 
+    unsigned char xor_message[32]; 
+    unsigned char xor_mac[16];
+    cbc_mac(key, message, mac);
+    memcpy(xor_message, message, 16); 
+    for (int i = 0; i < 16; i++) {
+        xor_message[16 + i] = message[i] ^ mac[i];
+    }
+    cbc_mac(key, xor_message, xor_mac);
+    printf("CBC-MAC for the one-block message: ");
+    for (int i = 0; i < 16; i++) {
+        printf("%02X", mac[i]);
+    }
+    printf("\n");
+    printf("CBC-MAC for the two-block message: ");
+    for (int i = 0; i < 16; i++) {
+        printf("%02X", xor_mac[i]);
+    }
+    printf("\n");
+    return 0;
+}
