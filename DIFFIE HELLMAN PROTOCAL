@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+unsigned long long power(unsigned long long base, unsigned long long exp, unsigned long long mod) {
+    unsigned long long result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 == 1)
+            result = (result * base) % mod;
+        exp = exp / 2;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+unsigned long long mod_inverse(unsigned long long a, unsigned long long m) {
+    unsigned long long m0 = m;
+    unsigned long long t, q;
+    unsigned long long x0 = 0, x1 = 1;
+    while (a > 1) {
+        q = a / m;
+        t = m;
+        m = a % m, a = t;
+        t = x0;
+        x0 = x1 - q * x0;
+        x1 = t;
+    }
+    if (x1 < 0)
+        x1 += m0;
+    return x1;
+}
+int main() {
+    unsigned long long p, g, a, b, A, B, secret_A, secret_B;
+    printf("Enter a prime number (p): ");
+    scanf("%llu", &p);
+    printf("Enter a generator of the multiplicative group modulo p (g): ");
+    scanf("%llu", &g);
+    printf("Enter Alice's secret key (a): ");
+    scanf("%llu", &a);
+    printf("Enter Bob's secret key (b): ");
+    scanf("%llu", &b);
+    A = power(g, a, p);
+    B = power(g, b, p);
+    secret_B = power(A, b, p); 
+    printf("\nAlice's public key (A): %llu\n", A);
+    printf("Bob's public key (B): %llu\n", B);
+    printf("\nShared secret calculated by Alice: %llu\n", secret_A);
+    printf("Shared secret calculated by Bob: %llu\n", secret_B);
+    return 0;
+}
+1 comment on commit 8282a9f
