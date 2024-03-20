@@ -1,0 +1,10 @@
+#include <stdio.h>
+#include <math.h>
+int main() {
+    int rate = 576; 
+    int capacity = 448; 
+    int block_size = 1024; 
+    int num_blocks = (int)ceil((double)capacity / rate);
+    printf("Number of message blocks required to fill the capacity portion: %d\n", num_blocks);
+    return 0;
+}
